@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class Huan {
     public static String line = "____________________________________________________________";
     public static String space = "    ";
-    private String[] tasks = new String[100];
+    private Task[] tasks = new Task[100];
     private static int taskId = 0;
 
     public void printGreeting(){
@@ -28,7 +28,7 @@ public class Huan {
     }
 
     public void addTask(String task) {
-        tasks[taskId] = task;
+        tasks[taskId] = new Task(task);
         taskId++;
     }
 
@@ -38,13 +38,32 @@ public class Huan {
 
     public void getTasks() {
         System.out.println(space + line);
+        System.out.println(space + "Here are the tasks in your list:");
         if (taskId == 0) {
             System.out.println(space + "No tasks added yet.");
         } else {
             for (int i = 0; i < taskId; i++) {
-                System.out.println(space + (i + 1) + ". " + tasks[i]);
+                System.out.println(space + (i + 1) + ". " + tasks[i].toString());
             }
         }
+        System.out.println(space + line);
+    }
+
+    public void markTask(int id){
+        Task t = tasks[id - 1];
+        t.markAsDone();
+        System.out.println(space + line);
+        System.out.println(space + "Nice! I've marked this task as done:");
+        System.out.println(space + "  " + t);
+        System.out.println(space + line);
+    }
+
+    public void UnmarkTask(int id){
+        Task t = tasks[id - 1];
+        t.markAsUndone();
+        System.out.println(space + line);
+        System.out.println(space + "OK, I've marked this task as not done yet:");
+        System.out.println(space + "  " + t);
         System.out.println(space + line);
     }
 
@@ -56,12 +75,19 @@ public class Huan {
         while (true) {
             String input = scanner.nextLine();
 
-
             if (input.equals("bye")) {
                 bot.printExit();
                 break;
             } else if (input.equals("list")) {
                 bot.getTasks();
+            } else if (input.startsWith("mark")) {
+                String[] parts = input.split(" ");
+                int id = Integer.parseInt(parts[1]);
+                bot.markTask(id);
+            } else if (input.startsWith("unmark")) {
+                String[] parts = input.split(" ");
+                int id = Integer.parseInt(parts[1]);
+                bot.UnmarkTask(id);
             } else if (!input.isEmpty()) {
                 bot.addTask(input);
                 bot.printInput("added: " + input);
