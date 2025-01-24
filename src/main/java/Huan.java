@@ -54,7 +54,10 @@ public class Huan {
     }
 
     // Marks the task with X
-    public void markTask(int id){
+    public void markTask(int id) throws HuanException{
+        if (id <= 0 || id > taskId) {
+            throw new HuanException("Invalid task number!");
+        }
         Task t = tasks[id - 1];
         t.markAsDone();
         System.out.println(space + line);
@@ -64,7 +67,10 @@ public class Huan {
     }
 
     // Unmarks the task
-    public void UnmarkTask(int id){
+    public void UnmarkTask(int id) throws HuanException {
+        if (id <= 0 || id > taskId) {
+            throw new HuanException("Invalid task number!");
+        }
         Task t = tasks[id - 1];
         t.markAsUndone();
         System.out.println(space + line);
@@ -114,39 +120,66 @@ public class Huan {
         while (true) {
             String input = scanner.nextLine().trim();
 
-            if (input.equals("bye")) {
-                bot.printExit();
-                break;
-            } else if (input.equals("list")) {
-                bot.getTasks();
-            } else if (input.startsWith("mark")) {
-                String[] parts = input.split(" ");
-                int id = Integer.parseInt(parts[1]);
-                bot.markTask(id);
-            } else if (input.startsWith("unmark")) {
-                String[] parts = input.split(" ");
-                int id = Integer.parseInt(parts[1]);
-                bot.UnmarkTask(id);
-                //TODO
-                // make elseif statements for each of the tasks
-            } else if (input.startsWith("todo")) {
-                String description = input.substring(5).trim();
-                bot.addTodo(description);
-            } else if (input.startsWith("deadline")) {
-                String[] parts = input.split("/by", 2);
-                String description =  parts[0].substring(9).trim();
-                String by = parts[1].trim();
-                bot.addDeadline(description, by);
-            } else if (input.startsWith("event")) {
-                String[] fromPart = input.split("/from", 2);
-                String description = fromPart[0].substring(6).trim();
-                String toPart[] = fromPart[1].split("/to", 2);
-                String from = toPart[0].trim();
-                String to = toPart[1].trim();
-                bot.addEvent(description, from, to);
-            } else {
+            try {
+                if (input.equalsIgnoreCase("bye")) {
+                    bot.printExit();
+                    break;
+                } else if (input.equalsIgnoreCase("list")) {
+                    bot.getTasks();
+                } else if (input.startsWith("mark")) {
+                    String[] parts = input.split(" ", 2);
+                    if (parts.length != 2){
+                        throw new HuanException("Include task number to mark!");
+                    }
+                    int id = Integer.parseInt(parts[1]);
+                    bot.markTask(id);
+                } else if (input.startsWith("unmark")) {
+                    String[] parts = input.split(" ", 2);
+                    if (parts.length != 2){
+                        throw new HuanException("Include task number to unmark!");
+                    }
+                    int id = Integer.parseInt(parts[1]);
+                    bot.UnmarkTask(id);
+                } else if (input.startsWith("todo")) {
+                    if (input.length() == 4) {
+                        throw new HuanException("todo description cannot be empty!");
+                    }
+                    String description = input.substring(5).trim();
+                    bot.addTodo(description);
+                } else if (input.startsWith("deadline")) {
+                    String[] parts = input.split("/by", 2);
+                    if (parts.length < 2 || parts[0].substring(9).trim().isEmpty() || parts[1].trim().isEmpty()) {
+                        throw new HuanException("Follow format \"deadline (description) /by (date)\"");
+                    }
+                    String description =  parts[0].substring(9).trim();
+                    String by = parts[1].trim();
+                    bot.addDeadline(description, by);
+                } else if (input.startsWith("event")) {
+                    String[] fromPart = input.split("/from", 2);
+                    if (fromPart.length < 2 || fromPart[0].substring(6).trim().isEmpty()) {
+                        throw new HuanException("Follow format \"event (description) /from (fromDate) /to (toDate)\"");
+                    }
+                    String description = fromPart[0].substring(6).trim();
+                    String toPart[] = fromPart[1].split("/to", 2);
+                    String from = toPart[0].trim();
+                    String to = toPart[1].trim();
+                    bot.addEvent(description, from, to);
+                } else {
+                    System.out.println(space + line);
+                    System.out.println(space + "Invalid input!");
+                    System.out.println(space + line);
+                }
+            } catch (HuanException e) {
                 System.out.println(space + line);
-                System.out.println(space + "Invalid input!");
+                System.out.println(space + "Error: " + e.getMessage());
+                System.out.println(space + line);
+            } catch (NumberFormatException e) {
+                System.out.println(space + line);
+                System.out.println(space + "Error: Please input an integer for the Task number");
+                System.out.println(space + line);
+            } catch (Exception e) {
+                System.out.println(space + line);
+                System.out.println(space + "Error: OOPS! Something went wrong!");
                 System.out.println(space + line);
             }
         }
