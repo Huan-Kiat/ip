@@ -1,10 +1,10 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Huan {
     public static String line = "____________________________________________________________";
     public static String space = "    ";
-    private Task[] tasks = new Task[100];
-    private static int taskId = 0;
+    private ArrayList<Task> tasks = new ArrayList<>();
 
     // Prints the greeting message
     public void printGreeting(){
@@ -23,31 +23,15 @@ public class Huan {
         System.out.println(space + line);
     }
 
-    // Adds task to the list
-    public void addTask(String task) {
-        tasks[taskId] = new Task(task);
-        taskId++;
-
-        System.out.println(space + line);
-        System.out.println(space + "Got it. I've added this task:");
-        System.out.println(space + "  " + task);
-        System.out.println(space + line);
-    }
-
-    // Returns the task ID
-    public int getTaskId() {
-        return taskId;
-    }
-
     // Prints the list of tasks
     public void getTasks() {
         System.out.println(space + line);
-        System.out.println(space + "Here are the tasks in your list:");
-        if (taskId == 0) {
+        if (tasks.isEmpty()) {
             System.out.println(space + "No tasks added yet.");
         } else {
-            for (int i = 0; i < taskId; i++) {
-                System.out.println(space + (i + 1) + ". " + tasks[i].toString());
+            System.out.println(space + "Here are the tasks in your list:");
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println(space + (i + 1) + ". " + tasks.get(i).toString());
             }
         }
         System.out.println(space + line);
@@ -55,10 +39,10 @@ public class Huan {
 
     // Marks the task with X
     public void markTask(int id) throws HuanException{
-        if (id <= 0 || id > taskId) {
+        if (id <= 0 || id > tasks.size()) {
             throw new HuanException("Invalid task number!");
         }
-        Task t = tasks[id - 1];
+        Task t = tasks.get(id - 1);
         t.markAsDone();
         System.out.println(space + line);
         System.out.println(space + "Nice! I've marked this task as done:");
@@ -68,10 +52,10 @@ public class Huan {
 
     // Unmarks the task
     public void UnmarkTask(int id) throws HuanException {
-        if (id <= 0 || id > taskId) {
+        if (id <= 0 || id > tasks.size()) {
             throw new HuanException("Invalid task number!");
         }
-        Task t = tasks[id - 1];
+        Task t = tasks.get(id - 1);
         t.markAsUndone();
         System.out.println(space + line);
         System.out.println(space + "OK, I've marked this task as not done yet:");
@@ -79,36 +63,41 @@ public class Huan {
         System.out.println(space + line);
     }
 
-    // Add a Deadline
-    public void addDeadline(String description, String by) {
-        tasks[taskId] = new Deadline(description, by);
-        taskId++;
+    // General method to add task
+    public void addTask(Task task) {
+        tasks.add(task);
         System.out.println(space + line);
         System.out.println(space + "Got it. I've added this task:");
-        System.out.println(space + "  " + tasks[taskId - 1]);
-        System.out.println(space + "Now you have " + taskId + " tasks in the list");
+        System.out.println(space + "  " + tasks.get(tasks.size() - 1));
+        System.out.println(space + "Now you have " + tasks.size() + " task(s) in the list");
         System.out.println(space + line);
+    }
+
+    // Add a Deadline
+    public void addDeadline(String description, String by) {
+        this.addTask(new Deadline(description, by));
     }
 
     // Add an Event
     public void addEvent(String description, String from, String to) {
-        tasks[taskId] = new Event(description, from, to);
-        taskId++;
-        System.out.println(space + line);
-        System.out.println(space + "Got it. I've added this task:");
-        System.out.println(space + "  " + tasks[taskId - 1]);
-        System.out.println(space + "Now you have " + taskId + " tasks in the list");
-        System.out.println(space + line);
+        this.addTask(new Event(description, from, to));
     }
 
     // Add a Todo
     public void addTodo(String description) {
-        tasks[taskId] = new Todo(description);
-        taskId++;
+        this.addTask(new Todo(description));
+    }
+
+    public void deleteTask(int id) throws HuanException{
+        if (id <= 0 || id > tasks.size()) {
+            throw new HuanException("Invalid task number!");
+        }
+        Task removedTask = tasks.get(id - 1);
+        tasks.remove(id - 1);
         System.out.println(space + line);
-        System.out.println(space + "Got it. I've added this task:");
-        System.out.println(space + "  " + tasks[taskId - 1]);
-        System.out.println(space + "Now you have " + taskId + " tasks in the list");
+        System.out.println(space + "Noted. I've removed this task:");
+        System.out.println(space + "  " + removedTask);
+        System.out.println(space + "Now you have " + tasks.size() + " task(s) in the list");
         System.out.println(space + line);
     }
 
@@ -140,6 +129,13 @@ public class Huan {
                     }
                     int id = Integer.parseInt(parts[1]);
                     bot.UnmarkTask(id);
+                } else if (input.startsWith("delete")) {
+                    String[] parts = input.split(" ", 2);
+                    if (parts.length != 2){
+                        throw new HuanException("Include task number to delete!");
+                    }
+                    int id = Integer.parseInt(parts[1]);
+                    bot.deleteTask(id);
                 } else if (input.startsWith("todo")) {
                     if (input.length() == 4) {
                         throw new HuanException("todo description cannot be empty!");
