@@ -14,6 +14,99 @@ public class Huan {
     }
 
     /**
+     * run() method to de-clutter main method
+     */
+    public void run() {
+        Scanner scanner = new Scanner(System.in);
+        printGreeting();
+
+        while (true) {
+            String input = scanner.nextLine().trim();
+            InputType command = parseInput(input);
+
+            try {
+                switch (command) {
+                case BYE:
+                    printExit();
+                    scanner.close();
+                    return;
+                case LIST:
+                    getTasks();
+                    break;
+                case MARK:
+                    String[] markParts = input.split(" ", 2);
+                    if (markParts.length != 2){
+                        throw new HuanException("Include task number to mark!");
+                    }
+                    int markId = Integer.parseInt(markParts[1]);
+                    markTask(markId);
+                    break;
+                case UNMARK:
+                    String[] unmarkParts = input.split(" ", 2);
+                    if (unmarkParts.length != 2){
+                        throw new HuanException("Include task number to unmark!");
+                    }
+                    int unmarkId = Integer.parseInt(unmarkParts[1]);
+                    UnmarkTask(unmarkId);
+                    break;
+                case DELETE:
+                    String[] deleteParts = input.split(" ", 2);
+                    if (deleteParts.length != 2){
+                        throw new HuanException("Include task number to delete!");
+                    }
+                    int deleteId = Integer.parseInt(deleteParts[1]);
+                    deleteTask(deleteId);
+                    break;
+                case TODO:
+                    if (input.length() == 4) {
+                        throw new HuanException("todo description cannot be empty!");
+                    }
+                    String todoDescription = input.substring(5).trim();
+                    addTodo(todoDescription);
+                    break;
+                case DEADLINE:
+                    String[] deadlineParts = input.split("/by", 2);
+                    if (deadlineParts.length < 2 || deadlineParts[0].substring(9).trim().isEmpty() || deadlineParts[1].trim().isEmpty()) {
+                        throw new HuanException("Follow format \"deadline (description) /by (date)\"");
+                    }
+                    String deadlineDescription =  deadlineParts[0].substring(9).trim();
+                    String by = deadlineParts[1].trim();
+                    addDeadline(deadlineDescription, by);
+                    break;
+                case EVENT:
+                    String[] fromParts = input.split("/from", 2);
+                    if (fromParts.length < 2 || fromParts[0].substring(6).trim().isEmpty()) {
+                        throw new HuanException("Follow format \"event (description) /from (fromDate) /to (toDate)\"");
+                    }
+                    String eventDescription = fromParts[0].substring(6).trim();
+                    String toParts[] = fromParts[1].split("/to", 2);
+                    String from = toParts[0].trim();
+                    String to = toParts[1].trim();
+                    addEvent(eventDescription, from, to);
+                    break;
+                case INVALID:
+                    System.out.println(space + line);
+                    System.out.println(space + "Invalid input!");
+                    System.out.println(space + line);
+                    break;
+                }
+            } catch (HuanException e) {
+                System.out.println(space + line);
+                System.out.println(space + "Error: " + e.getMessage());
+                System.out.println(space + line);
+            } catch (NumberFormatException e) {
+                System.out.println(space + line);
+                System.out.println(space + "Error: Please input an integer for the Task number");
+                System.out.println(space + line);
+            } catch (Exception e) {
+                System.out.println(space + line);
+                System.out.println(space + "Error: OOPS! Something went wrong!");
+                System.out.println(space + line);
+            }
+        }
+    }
+
+    /**
      * Prints the greeting.
      */
     public void printGreeting(){
@@ -168,93 +261,7 @@ public class Huan {
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         Huan bot = new Huan();
-        bot.printGreeting();
-
-        while (true) {
-            String input = scanner.nextLine().trim();
-            InputType command = bot.parseInput(input);
-
-            try {
-                switch (command) {
-                case BYE:
-                    bot.printExit();
-                    scanner.close();
-                    return;
-                case LIST:
-                    bot.getTasks();
-                    break;
-                case MARK:
-                    String[] markParts = input.split(" ", 2);
-                    if (markParts.length != 2){
-                        throw new HuanException("Include task number to mark!");
-                    }
-                    int markId = Integer.parseInt(markParts[1]);
-                    bot.markTask(markId);
-                    break;
-                case UNMARK:
-                    String[] unmarkParts = input.split(" ", 2);
-                    if (unmarkParts.length != 2){
-                        throw new HuanException("Include task number to unmark!");
-                    }
-                    int unmarkId = Integer.parseInt(unmarkParts[1]);
-                    bot.UnmarkTask(unmarkId);
-                    break;
-                case DELETE:
-                    String[] deleteParts = input.split(" ", 2);
-                    if (deleteParts.length != 2){
-                        throw new HuanException("Include task number to delete!");
-                    }
-                    int deleteId = Integer.parseInt(deleteParts[1]);
-                    bot.deleteTask(deleteId);
-                    break;
-                case TODO:
-                    if (input.length() == 4) {
-                        throw new HuanException("todo description cannot be empty!");
-                    }
-                    String todoDescription = input.substring(5).trim();
-                    bot.addTodo(todoDescription);
-                    break;
-                case DEADLINE:
-                    String[] deadlineParts = input.split("/by", 2);
-                    if (deadlineParts.length < 2 || deadlineParts[0].substring(9).trim().isEmpty() || deadlineParts[1].trim().isEmpty()) {
-                        throw new HuanException("Follow format \"deadline (description) /by (date)\"");
-                    }
-                    String deadlineDescription =  deadlineParts[0].substring(9).trim();
-                    String by = deadlineParts[1].trim();
-                    bot.addDeadline(deadlineDescription, by);
-                    break;
-                case EVENT:
-                    String[] fromParts = input.split("/from", 2);
-                    if (fromParts.length < 2 || fromParts[0].substring(6).trim().isEmpty()) {
-                        throw new HuanException("Follow format \"event (description) /from (fromDate) /to (toDate)\"");
-                    }
-                    String eventDescription = fromParts[0].substring(6).trim();
-                    String toParts[] = fromParts[1].split("/to", 2);
-                    String from = toParts[0].trim();
-                    String to = toParts[1].trim();
-                    bot.addEvent(eventDescription, from, to);
-                    break;
-                case INVALID:
-                    System.out.println(space + line);
-                    System.out.println(space + "Invalid input!");
-                    System.out.println(space + line);
-                    break;
-                }
-            } catch (HuanException e) {
-                System.out.println(space + line);
-                System.out.println(space + "Error: " + e.getMessage());
-                System.out.println(space + line);
-            } catch (NumberFormatException e) {
-                System.out.println(space + line);
-                System.out.println(space + "Error: Please input an integer for the Task number");
-                System.out.println(space + line);
-            } catch (Exception e) {
-                System.out.println(space + line);
-                System.out.println(space + "Error: OOPS! Something went wrong!");
-                System.out.println(space + line);
-            }
-        }
+        bot.run();
     }
 }
