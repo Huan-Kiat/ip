@@ -18,6 +18,9 @@ public class Huan {
         BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, INVALID
     }
 
+    public Huan() {
+        loadTasks();
+    }
     /**
      * run() method to de-clutter main method
      */
@@ -208,6 +211,7 @@ public class Huan {
         System.out.println(space + "  " + tasks.get(tasks.size() - 1));
         System.out.println(space + "Now you have " + tasks.size() + " task(s) in the list");
         System.out.println(space + line);
+        writeTasks();
     }
 
     /**
@@ -341,6 +345,33 @@ public class Huan {
 
             }
             scanner.close();
+        } catch (IOException e) {
+
+        }
+    }
+//todo commit the message to branch 7
+    public void writeTasks() {
+        try {
+            File file = new File(FILE_PATH);
+            FileWriter writer = new FileWriter(file);
+
+            for (Task task : tasks) {
+                if (task instanceof Todo t) {
+                    // T | 1 | read book
+                    writer.write("T | " + (t.isDone ? "1" : "0") + " | " + t.description);
+                } else if (task instanceof Deadline d) {
+                    // D | 0 | return book | June 6th
+                    writer.write("D | " + (d.isDone ? "1" : "0")
+                            + " | " + d.description + " | " + d.by);
+                } else if (task instanceof Event e) {
+                    // E | 0 | project meeting | Aug 6th 2-4pm
+                    writer.write("E | " + (e.isDone ? "1" : "0")
+                            + " | " + e.description + " | "
+                            + e.from + "-" + e.to);
+                }
+                writer.write(System.lineSeparator());
+            }
+            writer.close();
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
