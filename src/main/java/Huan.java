@@ -1,3 +1,7 @@
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.FileWriter;
@@ -15,12 +19,16 @@ public class Huan {
      * Enum for available inputs.
      */
     public enum InputType {
-        BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, INVALID
+        BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, INVALID, ON
     }
 
+    /**
+     * Activate the bot
+     */
     public Huan() {
         loadTasks();
     }
+
     /**
      * run() method to de-clutter main method
      */
@@ -74,6 +82,13 @@ public class Huan {
                 case EVENT:
                     parseEvent(input);
                     break;
+                case ON:
+                    String[] onParts = input.split(" ", 2);
+                    if (onParts.length < 2) {
+                        throw new HuanException("Follow format: on yyyy-MM-dd");
+                    }
+                    onDate(onParts[1].trim());
+                    break;
                 case INVALID:
                     System.out.println(space + line);
                     System.out.println(space + "Invalid input!");
@@ -88,6 +103,10 @@ public class Huan {
                 System.out.println(space + line);
                 System.out.println(space + "Error: Please input an integer for the Task number");
                 System.out.println(space + line);
+            } catch (DateTimeParseException e){
+                System.out.println(space + line);
+                System.out.println(space + "Error: Ensure you follow the format (yyyy-mm-dd HHmm)");
+                System.out.println(space + line);
             } catch (Exception e) {
                 System.out.println(space + line);
                 System.out.println(space + "Error: OOPS! Something went wrong!");
@@ -96,16 +115,28 @@ public class Huan {
         }
     }
 
+    /**
+     * Parses user input and adds task to the arraylist.
+     *
+     * @param input of user.
+     * @throws HuanException for invalid formats.
+     */
     public void parseDeadline(String input) throws HuanException{
         String[] deadlineParts = input.split("/by", 2);
         if (deadlineParts.length < 2 || deadlineParts[0].substring(9).trim().isEmpty() || deadlineParts[1].trim().isEmpty()) {
-            throw new HuanException("Follow format \"deadline (description) /by (date)\"");
+            throw new HuanException("Follow format \"deadline (description) /by (yyyy-MM-dd HHmm)\"");
         }
         String deadlineDescription =  deadlineParts[0].substring(9).trim();
         String by = deadlineParts[1].trim();
         addDeadline(deadlineDescription, by);
     }
 
+    /**
+     * Parses user input and adds task to the arraylist.
+     *
+     * @param input of user.
+     * @throws HuanException for invalid formats.
+     */
     public void parseToDo(String input) throws HuanException{
         if (input.length() == 4) {
             throw new HuanException("todo description cannot be empty!");
@@ -114,10 +145,18 @@ public class Huan {
         addTodo(todoDescription);
     }
 
+    /**
+     * Parses user input and adds task to the arraylist.
+     *
+     * @param input of user.
+     * @throws HuanException for invalid formats.
+     */
     public void parseEvent(String input) throws HuanException {
         String[] fromParts = input.split("/from", 2);
         if (fromParts.length < 2 || fromParts[0].substring(6).trim().isEmpty()) {
-            throw new HuanException("Follow format \"event (description) /from (fromDate) /to (toDate)\"");
+            throw new HuanException("Follow format \"event (description) " +
+                    "/from (yyyy-MM-dd HHmm) " +
+                    "/to (yyyy-MM-dd HHmm)\"");
         }
         String eventDescription = fromParts[0].substring(6).trim();
         String[] toParts = fromParts[1].split("/to", 2);
@@ -129,7 +168,7 @@ public class Huan {
     /**
      * Prints the greeting.
      */
-    public void printGreeting(){
+    public void printGreeting() {
         String greeting =  space + "Hello! I'm HUAN \n"
                 + space + "What can I do for you?";
         System.out.println(space + line);
@@ -140,7 +179,7 @@ public class Huan {
     /**
      * Prints the exit .
      */
-    public void printExit(){
+    public void printExit() {
         String exit = space + "Bye. Hope to see you again soon!";
         System.out.println(space + line);
         System.out.println(exit);
@@ -169,7 +208,7 @@ public class Huan {
      * @param id ID of task to be marked done.
      * @throws HuanException for invalid IDs.
      */
-    public void markTask(int id) throws HuanException{
+    public void markTask(int id) throws HuanException {
         if (id <= 0 || id > tasks.size()) {
             throw new HuanException("Invalid task number!");
         }
@@ -179,6 +218,7 @@ public class Huan {
         System.out.println(space + "Nice! I've marked this task as done:");
         System.out.println(space + "  " + t);
         System.out.println(space + line);
+        writeTasks();
     }
 
     /**
@@ -197,6 +237,7 @@ public class Huan {
         System.out.println(space + "OK, I've marked this task as not done yet:");
         System.out.println(space + "  " + t);
         System.out.println(space + line);
+        writeTasks();
     }
 
     /**
@@ -250,7 +291,7 @@ public class Huan {
      * @param id ID of the task to delete.
      * @throws HuanException For invalid IDs.
      */
-    public void deleteTask(int id) throws HuanException{
+    public void deleteTask(int id) throws HuanException {
         if (id <= 0 || id > tasks.size()) {
             throw new HuanException("Invalid task number!");
         }
@@ -281,6 +322,12 @@ public class Huan {
         }
     }
 
+    /**
+     * This method does several things:
+     *  Ensure that parent directory exists, create it if it does not exist
+     *  Create file if it does not exist
+     *  Read each line and parses the input
+     */
     public void loadTasks() {
         try {
             File file = new File(FILE_PATH);
@@ -309,7 +356,7 @@ public class Huan {
 
                 switch (type) {
                 case "T":
-                    addTodo(description);
+                    tasks.add(new Todo(description));
                     break;
                 case "D":
                     if (parts.length != 4) {
@@ -317,7 +364,7 @@ public class Huan {
                         continue;
                     }
                     String by = parts[3].trim();
-                    addDeadline(description, by);
+                    tasks.add(new Deadline(description, by));
                     break;
                 case "E":
                     if (parts.length != 4) {
@@ -325,13 +372,13 @@ public class Huan {
                         continue;
                     }
                     String time = parts[3].trim();
-                    String[] timeParts = time.split("-");
+                    String[] timeParts = time.split(" to ", 2);
                     if (timeParts.length != 2) {
                         System.out.println("Incorrect event time format: " + task);
                     }
                     String from = timeParts[0];
                     String to = timeParts[1];
-                    addEvent(description, from, to);
+                    tasks.add(new Event(description, from, to));
                     break;
                 default:
                     System.out.println("Invalid Task: " + task);
@@ -346,10 +393,15 @@ public class Huan {
             }
             scanner.close();
         } catch (IOException e) {
-
+            System.out.println("Error: " + e.getMessage());
         }
     }
-//todo commit the message to branch 7
+
+    /**
+     * This method is responsible for writing user input into the file whenever:
+     *  A task is added
+     *  A task is marked
+     */
     public void writeTasks() {
         try {
             File file = new File(FILE_PATH);
@@ -362,12 +414,15 @@ public class Huan {
                 } else if (task instanceof Deadline d) {
                     // D | 0 | return book | June 6th
                     writer.write("D | " + (d.isDone ? "1" : "0")
-                            + " | " + d.description + " | " + d.by);
+                            + " | " + d.description + " | "
+                            + d.by.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm")));
                 } else if (task instanceof Event e) {
                     // E | 0 | project meeting | Aug 6th 2-4pm
                     writer.write("E | " + (e.isDone ? "1" : "0")
                             + " | " + e.description + " | "
-                            + e.from + "-" + e.to);
+                            + e.from.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"))
+                            + " to "
+                            + e.to.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm")));
                 }
                 writer.write(System.lineSeparator());
             }
@@ -376,6 +431,43 @@ public class Huan {
             System.out.println("Error: " + e.getMessage());
         }
     }
+
+    /**
+     * Check if there are any tasks that occur on the given date.
+     *
+     * @param date The date to check for tasks.
+     * @throws HuanException when there is an error in input date format.
+     */
+    public void onDate(String date) throws HuanException {
+        try {
+            LocalDate target = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            System.out.println(space + line);
+            System.out.println(space + "Here are the task(s) on this date:");
+            boolean validDate = false;
+            for (Task task : tasks) {
+                if (task instanceof Deadline d) {
+                    if (d.by.toLocalDate().equals(target)) {
+                        System.out.println(space + task);
+                        validDate = true;
+                    }
+                } else if (task instanceof Event e) {
+                    if(!e.from.toLocalDate().isAfter(target) && !e.to.toLocalDate().isBefore(target)) {
+                        System.out.println(space + task);
+                        validDate = true;
+                    }
+                }
+            }
+
+            if (!validDate) {
+                System.out.println(space + "Phew! There are no tasks on this date!");
+            }
+            System.out.println(space + line);
+
+        } catch (DateTimeParseException e) {
+            throw new HuanException("Invalid date format! (yyyy-MM-dd)");
+        }
+    }
+
 
     public static void main(String[] args) {
         Huan bot = new Huan();
