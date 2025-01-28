@@ -1,10 +1,15 @@
-import java.util.Scanner;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
+
 
 public class Huan {
     public static String line = "____________________________________________________________";
     public static String space = "    ";
     private ArrayList<Task> tasks = new ArrayList<>();
+    private static final String FILE_PATH = "data/huan.txt";
 
     /**
      * Enum for available inputs.
@@ -13,6 +18,9 @@ public class Huan {
         BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, INVALID
     }
 
+    public Huan() {
+        loadTasks();
+    }
     /**
      * run() method to de-clutter main method
      */
@@ -58,31 +66,13 @@ public class Huan {
                     deleteTask(deleteId);
                     break;
                 case TODO:
-                    if (input.length() == 4) {
-                        throw new HuanException("todo description cannot be empty!");
-                    }
-                    String todoDescription = input.substring(5).trim();
-                    addTodo(todoDescription);
+                    parseToDo(input);
                     break;
                 case DEADLINE:
-                    String[] deadlineParts = input.split("/by", 2);
-                    if (deadlineParts.length < 2 || deadlineParts[0].substring(9).trim().isEmpty() || deadlineParts[1].trim().isEmpty()) {
-                        throw new HuanException("Follow format \"deadline (description) /by (date)\"");
-                    }
-                    String deadlineDescription =  deadlineParts[0].substring(9).trim();
-                    String by = deadlineParts[1].trim();
-                    addDeadline(deadlineDescription, by);
+                    parseDeadline(input);
                     break;
                 case EVENT:
-                    String[] fromParts = input.split("/from", 2);
-                    if (fromParts.length < 2 || fromParts[0].substring(6).trim().isEmpty()) {
-                        throw new HuanException("Follow format \"event (description) /from (fromDate) /to (toDate)\"");
-                    }
-                    String eventDescription = fromParts[0].substring(6).trim();
-                    String toParts[] = fromParts[1].split("/to", 2);
-                    String from = toParts[0].trim();
-                    String to = toParts[1].trim();
-                    addEvent(eventDescription, from, to);
+                    parseEvent(input);
                     break;
                 case INVALID:
                     System.out.println(space + line);
@@ -104,6 +94,36 @@ public class Huan {
                 System.out.println(space + line);
             }
         }
+    }
+
+    public void parseDeadline(String input) throws HuanException{
+        String[] deadlineParts = input.split("/by", 2);
+        if (deadlineParts.length < 2 || deadlineParts[0].substring(9).trim().isEmpty() || deadlineParts[1].trim().isEmpty()) {
+            throw new HuanException("Follow format \"deadline (description) /by (date)\"");
+        }
+        String deadlineDescription =  deadlineParts[0].substring(9).trim();
+        String by = deadlineParts[1].trim();
+        addDeadline(deadlineDescription, by);
+    }
+
+    public void parseToDo(String input) throws HuanException{
+        if (input.length() == 4) {
+            throw new HuanException("todo description cannot be empty!");
+        }
+        String todoDescription = input.substring(5).trim();
+        addTodo(todoDescription);
+    }
+
+    public void parseEvent(String input) throws HuanException {
+        String[] fromParts = input.split("/from", 2);
+        if (fromParts.length < 2 || fromParts[0].substring(6).trim().isEmpty()) {
+            throw new HuanException("Follow format \"event (description) /from (fromDate) /to (toDate)\"");
+        }
+        String eventDescription = fromParts[0].substring(6).trim();
+        String[] toParts = fromParts[1].split("/to", 2);
+        String from = toParts[0].trim();
+        String to = toParts[1].trim();
+        addEvent(eventDescription, from, to);
     }
 
     /**
@@ -191,6 +211,7 @@ public class Huan {
         System.out.println(space + "  " + tasks.get(tasks.size() - 1));
         System.out.println(space + "Now you have " + tasks.size() + " task(s) in the list");
         System.out.println(space + line);
+        writeTasks();
     }
 
     /**
@@ -257,6 +278,102 @@ public class Huan {
             return InputType.valueOf(command.toUpperCase());
         } catch (IllegalArgumentException e) {
             return InputType.INVALID;
+        }
+    }
+
+    public void loadTasks() {
+        try {
+            File file = new File(FILE_PATH);
+            //Create parent directory if missing
+            file.getParentFile().mkdirs();
+
+            //Create file if missing
+            if (!file.exists()) {
+                file.createNewFile();
+                return;
+            }
+
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                String task = scanner.nextLine().trim();
+                String[] parts = task.split("\\|");
+                //Check if format of task is correct
+                if (parts.length < 3) {
+                    System.out.println("Incorrect task format: " + task);
+                    continue;
+                }
+
+                String type = parts[0].trim();
+                String done = parts[1].trim();
+                String description = parts[2].trim();
+
+                switch (type) {
+                case "T":
+                    addTodo(description);
+                    break;
+                case "D":
+                    if (parts.length != 4) {
+                        System.out.println("Incorrect deadline format: " + task);
+                        continue;
+                    }
+                    String by = parts[3].trim();
+                    addDeadline(description, by);
+                    break;
+                case "E":
+                    if (parts.length != 4) {
+                        System.out.println("Incorrect event format: " + task);
+                        continue;
+                    }
+                    String time = parts[3].trim();
+                    String[] timeParts = time.split("-");
+                    if (timeParts.length != 2) {
+                        System.out.println("Incorrect event time format: " + task);
+                    }
+                    String from = timeParts[0];
+                    String to = timeParts[1];
+                    addEvent(description, from, to);
+                    break;
+                default:
+                    System.out.println("Invalid Task: " + task);
+                    continue;
+                }
+
+                if (done.equals("1")) {
+                    Task newTask = tasks.get(tasks.size() - 1);
+                    newTask.markAsDone();
+                }
+
+            }
+            scanner.close();
+        } catch (IOException e) {
+
+        }
+    }
+//todo commit the message to branch 7
+    public void writeTasks() {
+        try {
+            File file = new File(FILE_PATH);
+            FileWriter writer = new FileWriter(file);
+
+            for (Task task : tasks) {
+                if (task instanceof Todo t) {
+                    // T | 1 | read book
+                    writer.write("T | " + (t.isDone ? "1" : "0") + " | " + t.description);
+                } else if (task instanceof Deadline d) {
+                    // D | 0 | return book | June 6th
+                    writer.write("D | " + (d.isDone ? "1" : "0")
+                            + " | " + d.description + " | " + d.by);
+                } else if (task instanceof Event e) {
+                    // E | 0 | project meeting | Aug 6th 2-4pm
+                    writer.write("E | " + (e.isDone ? "1" : "0")
+                            + " | " + e.description + " | "
+                            + e.from + "-" + e.to);
+                }
+                writer.write(System.lineSeparator());
+            }
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
