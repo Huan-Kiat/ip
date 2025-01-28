@@ -1,3 +1,4 @@
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.io.File;
 import java.io.FileWriter;
@@ -99,7 +100,7 @@ public class Huan {
     public void parseDeadline(String input) throws HuanException{
         String[] deadlineParts = input.split("/by", 2);
         if (deadlineParts.length < 2 || deadlineParts[0].substring(9).trim().isEmpty() || deadlineParts[1].trim().isEmpty()) {
-            throw new HuanException("Follow format \"deadline (description) /by (date)\"");
+            throw new HuanException("Follow format \"deadline (description) /by (yyyy-MM-dd HHmm)\"");
         }
         String deadlineDescription =  deadlineParts[0].substring(9).trim();
         String by = deadlineParts[1].trim();
@@ -117,7 +118,9 @@ public class Huan {
     public void parseEvent(String input) throws HuanException {
         String[] fromParts = input.split("/from", 2);
         if (fromParts.length < 2 || fromParts[0].substring(6).trim().isEmpty()) {
-            throw new HuanException("Follow format \"event (description) /from (fromDate) /to (toDate)\"");
+            throw new HuanException("Follow format \"event (description) " +
+                    "/from (yyyy-MM-dd HHmm) " +
+                    "/to (yyyy-MM-dd HHmm)\"");
         }
         String eventDescription = fromParts[0].substring(6).trim();
         String[] toParts = fromParts[1].split("/to", 2);
@@ -309,7 +312,7 @@ public class Huan {
 
                 switch (type) {
                 case "T":
-                    addTodo(description);
+                    tasks.add(new Todo(description));
                     break;
                 case "D":
                     if (parts.length != 4) {
@@ -317,7 +320,7 @@ public class Huan {
                         continue;
                     }
                     String by = parts[3].trim();
-                    addDeadline(description, by);
+                    tasks.add(new Deadline(description, by));
                     break;
                 case "E":
                     if (parts.length != 4) {
@@ -331,7 +334,7 @@ public class Huan {
                     }
                     String from = timeParts[0];
                     String to = timeParts[1];
-                    addEvent(description, from, to);
+                    tasks.add(new Event(description, from, to));
                     break;
                 default:
                     System.out.println("Invalid Task: " + task);
@@ -346,10 +349,10 @@ public class Huan {
             }
             scanner.close();
         } catch (IOException e) {
-
+            System.out.println("Error: " + e.getMessage());
         }
     }
-//todo commit the message to branch 7
+
     public void writeTasks() {
         try {
             File file = new File(FILE_PATH);
@@ -362,12 +365,15 @@ public class Huan {
                 } else if (task instanceof Deadline d) {
                     // D | 0 | return book | June 6th
                     writer.write("D | " + (d.isDone ? "1" : "0")
-                            + " | " + d.description + " | " + d.by);
+                            + " | " + d.description + " | "
+                            + d.by.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm")));
                 } else if (task instanceof Event e) {
                     // E | 0 | project meeting | Aug 6th 2-4pm
                     writer.write("E | " + (e.isDone ? "1" : "0")
                             + " | " + e.description + " | "
-                            + e.from + "-" + e.to);
+                            + e.from.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"))
+                            + "-"
+                            + e.to.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm")));
                 }
                 writer.write(System.lineSeparator());
             }
