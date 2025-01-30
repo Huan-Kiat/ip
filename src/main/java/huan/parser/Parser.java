@@ -1,5 +1,10 @@
-public class Parser {
+package huan.parser;
 
+import huan.exception.HuanException;
+import huan.ui.Huan;
+import huan.tasks.TaskList;
+
+public class Parser {
     /**
      * Parse the user input to determine the input type.
      *
