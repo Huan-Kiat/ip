@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class Storage {
@@ -17,7 +16,7 @@ public class Storage {
      *  Create file if it does not exist
      *  Read each line and parses the input
      */
-    public void loadTasks() {
+    public TaskList loadTasks() throws HuanException {
         try {
             TaskList tasks = new TaskList();
             File file = new File(filePath);
@@ -27,7 +26,7 @@ public class Storage {
             //Create file if missing
             if (!file.exists()) {
                 file.createNewFile();
-                return;
+                return tasks;
             }
 
             Scanner scanner = new Scanner(file);
@@ -46,7 +45,7 @@ public class Storage {
 
                 switch (type) {
                 case "T":
-                    tasks.addTask(new Todo(description));
+                    tasks.loadTask(new Todo(description));
                     break;
                 case "D":
                     if (parts.length != 4) {
@@ -54,7 +53,7 @@ public class Storage {
                         continue;
                     }
                     String by = parts[3].trim();
-                    tasks.addTask(new Deadline(description, by));
+                    tasks.loadTask(new Deadline(description, by));
                     break;
                 case "E":
                     if (parts.length != 4) {
@@ -68,7 +67,7 @@ public class Storage {
                     }
                     String from = timeParts[0];
                     String to = timeParts[1];
-                    tasks.addTask(new Event(description, from, to));
+                    tasks.loadTask(new Event(description, from, to));
                     break;
                 default:
                     System.out.println("Invalid Task: " + task);
@@ -82,8 +81,9 @@ public class Storage {
 
             }
             scanner.close();
+            return tasks;
         } catch (IOException e) {
-            System.out.println("Error: " + e.getMessage());
+            throw new HuanException();
         }
     }
 
@@ -92,30 +92,13 @@ public class Storage {
      *  A task is added
      *  A task is marked
      */
-    public void writeTasks() {
+    public void writeTasks(TaskList tasks) {
         try {
-            TaskList tasks = new TaskList();
             File file = new File(filePath);
             FileWriter writer = new FileWriter(file);
 
             for (Task task : tasks.getTaskList()) {
-                if (task instanceof Todo t) {
-                    // T | 1 | read book
-                    writer.write("T | " + (t.isDone ? "1" : "0") + " | " + t.description);
-                } else if (task instanceof Deadline d) {
-                    // D | 0 | return book | June 6th
-                    writer.write("D | " + (d.isDone ? "1" : "0")
-                            + " | " + d.description + " | "
-                            + d.by.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm")));
-                } else if (task instanceof Event e) {
-                    // E | 0 | project meeting | Aug 6th 2-4pm
-                    writer.write("E | " + (e.isDone ? "1" : "0")
-                            + " | " + e.description + " | "
-                            + e.from.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"))
-                            + " to "
-                            + e.to.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm")));
-                }
-                writer.write(System.lineSeparator());
+                writer.write(task.fileFormat() + System.lineSeparator());
             }
             writer.close();
         } catch (IOException e) {

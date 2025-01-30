@@ -1,6 +1,7 @@
 import java.util.Scanner;
 
 public class Ui {
+    private Scanner scanner;
     public static String LINE = "____________________________________________________________";
     public static String SPACE = "    ";
 
@@ -13,7 +14,7 @@ public class Ui {
      * Prints the greeting.
      */
     public void printGreeting() {
-        String greeting =  SPACE + "Hello! I'm HUAN \n"
+        String greeting =  "Hello! I'm HUAN \n"
                 + SPACE + "What can I do for you?";
         printFormat(greeting);
     }
@@ -22,7 +23,7 @@ public class Ui {
      * Prints the exit.
      */
     public void printExit() {
-        String exit = SPACE + "Bye. Hope to see you again soon!";
+        String exit = "Bye. Hope to see you again soon!";
         printFormat(exit);
     }
 
@@ -30,9 +31,9 @@ public class Ui {
      * Format the output string.
      * @param message the message to be formatted.
      */
-    public void printFormat(String message) {
+    public static void printFormat(String message) {
         System.out.println(SPACE + LINE);
-        System.out.println(message);
+        System.out.println(SPACE + message);
         System.out.println(SPACE + LINE);
     }
 
@@ -41,16 +42,19 @@ public class Ui {
      * @return returns the input command without whitespace.
      */
     public String readInput() {
-        Scanner scanner = new Scanner(System.in);
+        this.scanner = new Scanner(System.in);
         return scanner.nextLine().trim();
+    }
+
+    public void closeScanner() {
+        this.scanner.close();
     }
 
     /**
      * Prints the list of tasks.
      */
-    public void showTaskList() {
-        TaskList tasks = new TaskList();
-        System.out.println(SPACE + LINE);
+    public void showTaskList(TaskList tasks) {
+        showLine();
         if (tasks.isEmpty()) {
             System.out.println(SPACE + "No tasks added yet.");
         } else {
@@ -59,6 +63,10 @@ public class Ui {
                 System.out.println(SPACE + (i + 1) + ". " + tasks.getTask(i).toString());
             }
         }
-        System.out.println(SPACE + LINE);
+        showLine();
+    }
+
+    public void showLoadingError() {
+        printFormat("Error: Unable to load tasks from file!");
     }
 }
