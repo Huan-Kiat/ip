@@ -3,4 +3,8 @@ public class HuanException extends Exception{
         super(description);
     }
 
+    public HuanException() {
+        super();
+    }
+
 }

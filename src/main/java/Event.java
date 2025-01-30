@@ -18,4 +18,13 @@ public class Event extends Task {
                 + " to: "
                 + to.format(DateTimeFormatter.ofPattern("MMM dd yyyy, hh:mma")) + ")";
     }
+
+    @Override
+    public String fileFormat() {
+        return "E | " + (isDone ? "1" : "0")
+                + " | " + description + " | "
+                + from.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"))
+                + " to "
+                + to.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"));
+    }
 }
