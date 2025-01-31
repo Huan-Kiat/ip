@@ -46,7 +46,7 @@ public class Parser {
      * @throws HuanException for invalid formats.
      */
     public static void parseToDo(TaskList tasks, String input) throws HuanException{
-        if (input.length() == 4) {
+        if (input.trim().length() == 4) {
             throw new HuanException("todo description cannot be empty!");
         }
         String todoDescription = input.substring(5).trim();
