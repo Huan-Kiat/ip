@@ -16,7 +16,7 @@ public class Huan {
      * Enum for available inputs.
      */
     public enum InputType {
-        BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, INVALID, ON
+        BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, INVALID, ON, FIND
     }
 
     /**
@@ -98,6 +98,14 @@ public class Huan {
                         throw new HuanException("Follow format: on yyyy-MM-dd");
                     }
                     tasks.onDate(onParts[1].trim());
+                    break;
+                case FIND:
+                    String[] findParts = input.split(" ", 2);
+                    if (findParts.length < 2) {
+                        throw new HuanException("What do you want to find?");
+                    }
+                    String keyword = findParts[1].trim();
+                    tasks.findTasks(keyword);
                     break;
                 case INVALID:
                     Ui.printFormat("Invalid input!");

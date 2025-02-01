@@ -160,5 +160,26 @@ public class TaskList {
         }
     }
 
+    public void findTasks(String description) {
+        boolean existsTask = false;
+        TaskList newTasks = new TaskList();
+        for (Task task : tasks) {
+            if (task.description.toLowerCase().contains(description.toLowerCase())) {
+                newTasks.loadTask(task);
+                existsTask = true;
+            }
+        }
+        if (!existsTask) {
+            Ui.printFormat("No such task found!");
+        } else {
+            System.out.println(Ui.SPACE + Ui.LINE);
+            System.out.println(Ui.SPACE + "Here are the matching tasks in your list:");
+            for (Task task : newTasks.getTaskList()) {
+                System.out.println(Ui.SPACE + task);
+            }
+            System.out.println(Ui.SPACE + Ui.LINE);
+        }
+
+    }
 
 }
