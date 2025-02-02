@@ -11,18 +11,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
+/**
+ * Handles loading and saving of tasks to a file path.
+ */
 public class Storage {
     private String filePath;
 
+    /**
+     * Creates a Storage object with the specified file path.
+     *
+     * @param filePath The file path where tasks should be loaded/saved.
+     */
     public Storage(String filePath) {
         this.filePath = filePath;
     }
 
     /**
-     * This method does several things:
-     *  Ensure that parent directory exists, create it if it does not exist
-     *  Create file if it does not exist
-     *  Read each line and parses the input
+     * Loads task from fil path, creating the file/directories if necessary
      */
     public TaskList loadTasks() throws HuanException {
         try {
@@ -96,9 +101,9 @@ public class Storage {
     }
 
     /**
-     * This method is responsible for writing user input into the file whenever:
-     *  A task is added
-     *  A task is marked
+     * Writes all tasks in the given TaskList to the file.
+     *
+     * @param tasks The TaskList whose tasks should be written.
      */
     public void writeTasks(TaskList tasks) {
         try {
