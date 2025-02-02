@@ -5,8 +5,8 @@ import java.util.Scanner;
 
 public class Ui {
     private Scanner scanner;
-    public static String LINE = "____________________________________________________________";
-    public static String SPACE = "    ";
+    public static final String LINE = "____________________________________________________________";
+    public static final String SPACE = "    ";
 
 
     public void showLine() {
