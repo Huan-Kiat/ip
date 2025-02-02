@@ -7,14 +7,25 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
+/**
+ * Manages a list of tasks and provides operations to manipulate them.
+ */
 public class TaskList {
     private ArrayList<Task> tasks;
 
+    /**
+     * Constructs an empty TaskList.
+     */
     public TaskList() {
         tasks = new ArrayList<>();
     }
 
 
+    /**
+     * Adds a task to this list and prints a confirmation message.
+     *
+     * @param task The task to add.
+     */
     public void addTask(Task task) {
         tasks.add(task);
         System.out.println(Ui.SPACE + Ui.LINE);
@@ -24,6 +35,12 @@ public class TaskList {
         System.out.println(Ui.SPACE + Ui.LINE);
     }
 
+    /**
+     * Deletes the task at the given index.
+     *
+     * @param id The index of the task to delete.
+     * @throws HuanException If the index is invalid.
+     */
     public void deleteTask(int id) throws HuanException {
         if (id <= 0 || id > tasks.size()) {
             throw new HuanException("Invalid task number!");
@@ -36,26 +53,51 @@ public class TaskList {
 
     }
 
+    /**
+     * Adds a task to this list without printing confirmation message.
+     *
+     * @param task The task to load.
+     */
     public void loadTask(Task task) {
         tasks.add(task);
     }
 
+    /**
+     * Returns the total number of tasks in this list.
+     *
+     * @return The size of this TaskList.
+     */
     public int getSize() {
         return tasks.size();
     }
 
+    /**
+     * Retrieves a task by its index.
+     *
+     * @param id The index of the task.
+     * @return The Task at the given index.
+     */
     public Task getTask(int id) {
         return tasks.get(id);
     }
 
+    /**
+     * Checks if this TaskList is empty.
+     *
+     * @return True if there are no tasks, false otherwise.
+     */
     public boolean isEmpty() {
         return tasks.isEmpty();
     }
 
+    /**
+     * Returns the list of Task objects.
+     *
+     * @return The ArrayList of Task.
+     */
     public ArrayList<Task> getTaskList() {
         return tasks;
     }
-
 
     /**
      * Marks a task as done based on ID.
@@ -93,7 +135,6 @@ public class TaskList {
         System.out.println(Ui.SPACE + Ui.LINE);
     }
 
-
     /**
      * Adds a Deadline
      *
@@ -125,7 +166,7 @@ public class TaskList {
     }
 
     /**
-     * Check if there are any tasks that occur on the given date.
+     * Checks if there are any tasks that occur on the given date.
      *
      * @param date The date to check for tasks.
      * @throws HuanException when there is an error in input date format.

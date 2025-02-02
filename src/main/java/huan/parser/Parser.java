@@ -4,6 +4,9 @@ import huan.exception.HuanException;
 import huan.ui.Huan;
 import huan.tasks.TaskList;
 
+/**
+ * Handles parsing of user commands and input.
+ */
 public class Parser {
     /**
      * Parse the user input to determine the input type.

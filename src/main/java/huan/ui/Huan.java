@@ -6,6 +6,10 @@ import huan.storage.Storage;
 import huan.tasks.TaskList;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Main class for the Huan bot, containing the program entry point.
+ *
+ */
 public class Huan {
     private Storage storage;
     private TaskList tasks;
@@ -20,7 +24,9 @@ public class Huan {
     }
 
     /**
-     * Activate the bot
+     * Activates the bot by loading tasks from storage and initializing UI components.
+     *
+     * @param filePath The filepath to load/save tasks from.
      */
     public Huan(String filePath) {
         ui = new Ui();
@@ -33,9 +39,8 @@ public class Huan {
         }
     }
 
-
     /**
-     * run() method to de-clutter main method
+     * Runs the loops until command 'bye' is encountered.
      */
     public void run() {
         ui.printGreeting();

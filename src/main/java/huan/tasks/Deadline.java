@@ -3,9 +3,18 @@ package huan.tasks;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Represents a deadline task with a specific due date/time.
+ */
 public class Deadline extends Task {
     protected LocalDateTime by;
 
+    /**
+     * Constructs a Deadline object with the specified description and due date/time.
+     *
+     * @param description The description of the deadline.
+     * @param by The deadline in "yyyy-MM-dd HHmm" format.
+     */
     public Deadline(String description, String by) {
         super(description);
         this.by = LocalDateTime.parse(by, DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"));

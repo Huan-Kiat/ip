@@ -5,10 +5,20 @@ import java.util.Scanner;
 
 public class Ui {
     private Scanner scanner;
+    
+    /**
+     * A line divider.
+     */
     public static final String LINE = "____________________________________________________________";
+
+    /**
+     * Indentation spaces for formatting.
+     */
     public static final String SPACE = "    ";
 
-
+    /**
+     * Handles user interaction: printing messages, formatting output, and reading input.
+     */
     public void showLine() {
         System.out.println(SPACE + LINE);
     }
@@ -31,8 +41,9 @@ public class Ui {
     }
 
     /**
-     * Format the output string.
-     * @param message the message to be formatted.
+     * Formats the output string with indentation and divider lines.
+     *
+     * @param message The message to be formatted.
      */
     public static void printFormat(String message) {
         System.out.println(SPACE + LINE);
@@ -41,20 +52,26 @@ public class Ui {
     }
 
     /**
-     * Initialises the scanner.
-     * @return returns the input command without whitespace.
+     * Initialises the scanner and reads the trimmed input.
+     *
+     * @return The trimmed input.
      */
     public String readInput() {
         this.scanner = new Scanner(System.in);
         return scanner.nextLine().trim();
     }
 
+    /**
+     * Closes the scanner.
+     */
     public void closeScanner() {
         this.scanner.close();
     }
 
     /**
-     * Prints the list of tasks.
+     * Prints the list of tasks in required format
+     *
+     * @param tasks The tasklist to get the tasks from.
      */
     public void showTaskList(TaskList tasks) {
         showLine();
@@ -69,6 +86,9 @@ public class Ui {
         showLine();
     }
 
+    /**
+     * Prints an error message indicating tasks could not be loaded from file.
+     */
     public void showLoadingError() {
         printFormat("Error: Unable to load tasks from file!");
     }
