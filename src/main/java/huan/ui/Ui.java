@@ -3,9 +3,12 @@ package huan.ui;
 import huan.tasks.TaskList;
 import java.util.Scanner;
 
+/**
+ * Manges the user interface part of the chatbot.
+ */
 public class Ui {
     private Scanner scanner;
-    
+
     /**
      * A line divider.
      */
@@ -27,7 +30,7 @@ public class Ui {
      * Prints the greeting.
      */
     public void printGreeting() {
-        String greeting =  "Hello! I'm HUAN \n"
+        String greeting = "Hello! I'm HUAN \n"
                 + SPACE + "What can I do for you?";
         printFormat(greeting);
     }

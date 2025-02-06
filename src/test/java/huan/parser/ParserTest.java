@@ -22,7 +22,8 @@ public class ParserTest {
     void parseInput_validCommands_returnsCorrectInputType() {
         assertEquals(Huan.InputType.TODO, Parser.parseInput("todo read book"));
         assertEquals(Huan.InputType.DEADLINE, Parser.parseInput("deadline submit report /by 2023-10-10 1800"));
-        assertEquals(Huan.InputType.EVENT, Parser.parseInput("event meeting /from 2023-10-10 0900 /to 2023-10-10 1000"));
+        assertEquals(Huan.InputType.EVENT,
+                Parser.parseInput("event meeting /from 2023-10-10 0900 /to 2023-10-10 1000"));
         assertEquals(Huan.InputType.MARK, Parser.parseInput("mark 1"));
         assertEquals(Huan.InputType.UNMARK, Parser.parseInput("unmark 2"));
         assertEquals(Huan.InputType.DELETE, Parser.parseInput("delete 3"));

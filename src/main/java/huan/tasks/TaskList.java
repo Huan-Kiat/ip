@@ -184,7 +184,7 @@ public class TaskList {
                         validDate = true;
                     }
                 } else if (task instanceof Event e) {
-                    if(!e.from.toLocalDate().isAfter(target) && !e.to.toLocalDate().isBefore(target)) {
+                    if (!e.from.toLocalDate().isAfter(target) && !e.to.toLocalDate().isBefore(target)) {
                         System.out.println(Ui.SPACE + task);
                         validDate = true;
                     }
@@ -201,6 +201,11 @@ public class TaskList {
         }
     }
 
+    /**
+     * Checks if there are any tasks with a matching description.
+     *
+     * @param description The description of the task to find.
+     */
     public void findTasks(String description) {
         boolean existsTask = false;
         TaskList newTasks = new TaskList();

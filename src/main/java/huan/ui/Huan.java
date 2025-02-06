@@ -60,7 +60,7 @@ public class Huan {
                     break;
                 case MARK:
                     String[] markParts = input.split(" ", 2);
-                    if (markParts.length != 2){
+                    if (markParts.length != 2) {
                         throw new HuanException("Include task number to mark!");
                     }
                     int markId = Integer.parseInt(markParts[1]);
@@ -69,7 +69,7 @@ public class Huan {
                     break;
                 case UNMARK:
                     String[] unmarkParts = input.split(" ", 2);
-                    if (unmarkParts.length != 2){
+                    if (unmarkParts.length != 2) {
                         throw new HuanException("Include task number to unmark!");
                     }
                     int unmarkId = Integer.parseInt(unmarkParts[1]);
@@ -78,7 +78,7 @@ public class Huan {
                     break;
                 case DELETE:
                     String[] deleteParts = input.split(" ", 2);
-                    if (deleteParts.length != 2){
+                    if (deleteParts.length != 2) {
                         throw new HuanException("Include task number to delete!");
                     }
                     int deleteId = Integer.parseInt(deleteParts[1]);
@@ -120,7 +120,7 @@ public class Huan {
                 Ui.printFormat("Error: " + e.getMessage());
             } catch (NumberFormatException e) {
                 Ui.printFormat("Error: Please input an integer for the Task number");
-            } catch (DateTimeParseException e){
+            } catch (DateTimeParseException e) {
                 Ui.printFormat("Error: Ensure you follow the format (yyyy-mm-dd HHmm)");
             } catch (Exception e) {
                 Ui.printFormat("Error: OOPS! Something went wrong!" + e.getMessage());

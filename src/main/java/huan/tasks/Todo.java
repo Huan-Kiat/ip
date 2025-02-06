@@ -5,7 +5,7 @@ package huan.tasks;
  * Represents a Todo task with a description.
  */
 
-public class Todo extends Task{
+public class Todo extends Task {
     /**
      * Constructs a Todo with the description.
      *

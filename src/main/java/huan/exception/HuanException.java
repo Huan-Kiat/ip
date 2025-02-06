@@ -3,7 +3,7 @@ package huan.exception;
 /**
  *  Represents a custom exception for Huan bot
  */
-public class HuanException extends Exception{
+public class HuanException extends Exception {
     /**
      * Constructs a new HuanException with the specified message.
      *
