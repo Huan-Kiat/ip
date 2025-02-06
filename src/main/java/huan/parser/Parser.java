@@ -1,8 +1,9 @@
 package huan.parser;
 
 import huan.exception.HuanException;
-import huan.ui.Huan;
 import huan.tasks.TaskList;
+import huan.ui.Huan;
+
 
 /**
  * Handles parsing of user commands and input.
@@ -32,12 +33,13 @@ public class Parser {
      * @param input of user.
      * @throws HuanException for invalid formats.
      */
-    public static void parseDeadline(TaskList tasks, String input) throws HuanException{
+    public static void parseDeadline(TaskList tasks, String input) throws HuanException {
         String[] deadlineParts = input.split("/by", 2);
-        if (deadlineParts.length < 2 || deadlineParts[0].substring(9).trim().isEmpty() || deadlineParts[1].trim().isEmpty()) {
+        if (deadlineParts.length < 2 || deadlineParts[0].substring(9).trim().isEmpty()
+                || deadlineParts[1].trim().isEmpty()) {
             throw new HuanException("Follow format \"deadline (description) /by (yyyy-MM-dd HHmm)\"");
         }
-        String deadlineDescription =  deadlineParts[0].substring(9).trim();
+        String deadlineDescription = deadlineParts[0].substring(9).trim();
         String by = deadlineParts[1].trim();
         tasks.addDeadline(deadlineDescription, by);
     }
@@ -48,7 +50,7 @@ public class Parser {
      * @param input of user.
      * @throws HuanException for invalid formats.
      */
-    public static void parseToDo(TaskList tasks, String input) throws HuanException{
+    public static void parseToDo(TaskList tasks, String input) throws HuanException {
         if (input.trim().length() == 4) {
             throw new HuanException("todo description cannot be empty!");
         }
@@ -65,9 +67,9 @@ public class Parser {
     public static void parseEvent(TaskList tasks, String input) throws HuanException {
         String[] fromParts = input.split("/from", 2);
         if (fromParts.length < 2 || fromParts[0].substring(6).trim().isEmpty()) {
-            throw new HuanException("Follow format \"event (description) " +
-                    "/from (yyyy-MM-dd HHmm) " +
-                    "/to (yyyy-MM-dd HHmm)\"");
+            throw new HuanException("Follow format \"event (description) "
+                    + "/from (yyyy-MM-dd HHmm) "
+                    + "/to (yyyy-MM-dd HHmm)\"");
         }
         String eventDescription = fromParts[0].substring(6).trim();
         String[] toParts = fromParts[1].split("/to", 2);
