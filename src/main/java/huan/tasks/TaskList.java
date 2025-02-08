@@ -1,7 +1,6 @@
 package huan.tasks;
 
 import huan.exception.HuanException;
-import huan.ui.Ui;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -20,41 +19,47 @@ public class TaskList {
         tasks = new ArrayList<>();
     }
 
-
     /**
-     * Adds a task to this list and prints a confirmation message.
+     * Adds a task to this list and returns a confirmation message.
      *
      * @param task The task to add.
+     * @return The confirmation message.
      */
-    public void addTask(Task task) {
+    public String addTask(Task task) {
         tasks.add(task);
-        System.out.println(Ui.SPACE + Ui.LINE);
-        System.out.println(Ui.SPACE + "Got it. I've added this task:");
-        System.out.println(Ui.SPACE + "  " + tasks.get(tasks.size() - 1));
-        System.out.println(Ui.SPACE + "Now you have " + tasks.size() + " task(s) in the list");
-        System.out.println(Ui.SPACE + Ui.LINE);
+        StringBuilder sb = new StringBuilder();
+        sb.append("____________________________________________________________\n");
+        sb.append("Got it. I've added this task:\n");
+        sb.append("  ").append(tasks.get(tasks.size() - 1)).append("\n");
+        sb.append("You now have ").append(tasks.size()).append(" task(s) in your list\n");
+        sb.append("____________________________________________________________");
+        return sb.toString();
     }
 
     /**
-     * Deletes the task at the given index.
+     * Deletes the task at the given index and returns a confirmation message.
      *
      * @param id The index of the task to delete.
+     * @return The confirmation message.
      * @throws HuanException If the index is invalid.
      */
-    public void deleteTask(int id) throws HuanException {
+    public String deleteTask(int id) throws HuanException {
         if (id <= 0 || id > tasks.size()) {
             throw new HuanException("Invalid task number!");
         }
         Task removedTask = tasks.get(id - 1);
         tasks.remove(id - 1);
-        Ui.printFormat("Noted. I've removed this task:\n"
-                + Ui.SPACE + "  " + removedTask + "\n"
-                + Ui.SPACE + "Now you have " + tasks.size() + " task(s) in the list");
-
+        StringBuilder sb = new StringBuilder();
+        sb.append("____________________________________________________________\n");
+        sb.append("Noted. I've removed this task:\n");
+        sb.append("  ").append(removedTask).append("\n");
+        sb.append("You now have ").append(tasks.size()).append(" task(s) in your list\n");
+        sb.append("____________________________________________________________");
+        return sb.toString();
     }
 
     /**
-     * Adds a task to this list without printing confirmation message.
+     * Adds a task to this list without printing a confirmation message.
      *
      * @param task The task to load.
      */
@@ -100,102 +105,105 @@ public class TaskList {
     }
 
     /**
-     * Marks a task as done based on ID.
+     * Marks a task as done based on ID and returns a confirmation message.
      *
      * @param id ID of task to be marked done.
+     * @return The confirmation message.
      * @throws HuanException for invalid IDs.
      */
-    public void markTask(int id) throws HuanException {
+    public String markTask(int id) throws HuanException {
         if (id <= 0 || id > this.getSize()) {
             throw new HuanException("Invalid task number!");
         }
         Task t = this.getTask(id - 1);
         t.markAsDone();
-        System.out.println(Ui.SPACE + Ui.LINE);
-        System.out.println(Ui.SPACE + "Nice! I've marked this task as done:");
-        System.out.println(Ui.SPACE + "  " + t);
-        System.out.println(Ui.SPACE + Ui.LINE);
+        StringBuilder sb = new StringBuilder();
+        sb.append("____________________________________________________________\n");
+        sb.append("Nice! I've marked this task as done:\n");
+        sb.append("  ").append(t).append("\n");
+        sb.append("____________________________________________________________");
+        return sb.toString();
     }
 
     /**
-     * Unmarks a task as done based on ID.
+     * Unmarks a task as done based on ID and returns a confirmation message.
      *
-     * @param id ID of task to be marked uundone.
+     * @param id ID of task to be unmarked.
+     * @return The confirmation message.
      * @throws HuanException for invalid IDs.
      */
-    public void unmarkTask(int id) throws HuanException {
+    public String unmarkTask(int id) throws HuanException {
         if (id <= 0 || id > this.getSize()) {
             throw new HuanException("Invalid task number!");
         }
         Task t = this.getTask(id - 1);
         t.markAsUndone();
-        System.out.println(Ui.SPACE + Ui.LINE);
-        System.out.println(Ui.SPACE + "OK, I've marked this task as not done yet:");
-        System.out.println(Ui.SPACE + "  " + t);
-        System.out.println(Ui.SPACE + Ui.LINE);
+        StringBuilder sb = new StringBuilder();
+        sb.append("OK, I've marked this task as not done yet:\n");
+        sb.append("  ").append(t).append("\n");
+        return sb.toString();
     }
 
     /**
-     * Adds a Deadline
+     * Adds a Deadline and returns the confirmation message.
      *
      * @param description Description of deadline.
      * @param by Deadline date.
      */
-    public void addDeadline(String description, String by) {
-        this.addTask(new Deadline(description, by));
+    public String addDeadline(String description, String by) {
+        return this.addTask(new Deadline(description, by));
     }
 
     /**
-     * Adds an Event.
+     * Adds an Event and returns the confirmation message.
      *
      * @param description Description of event.
      * @param from Start date/time of event.
      * @param to End date/time of event.
      */
-    public void addEvent(String description, String from, String to) {
-        this.addTask(new Event(description, from, to));
+    public String addEvent(String description, String from, String to) {
+        return this.addTask(new Event(description, from, to));
     }
 
     /**
-     * Adds a Todo.
+     * Adds a Todo and returns the confirmation message.
      *
      * @param description Description of todo.
      */
-    public void addTodo(String description) {
-        this.addTask(new Todo(description));
+    public String addTodo(String description) {
+        return this.addTask(new Todo(description));
     }
 
     /**
      * Checks if there are any tasks that occur on the given date.
      *
      * @param date The date to check for tasks.
+     * @return A message listing the tasks on that date.
      * @throws HuanException when there is an error in input date format.
      */
-    public void onDate(String date) throws HuanException {
+    public String onDate(String date) throws HuanException {
         try {
             LocalDate target = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            System.out.println(Ui.SPACE + Ui.LINE);
-            System.out.println(Ui.SPACE + "Here are the task(s) on this date:");
+            StringBuilder sb = new StringBuilder();
+            sb.append("Here are the task(s) on this date:\n");
             boolean validDate = false;
             for (Task task : this.getTaskList()) {
                 if (task instanceof Deadline d) {
                     if (d.by.toLocalDate().equals(target)) {
-                        System.out.println(Ui.SPACE + task);
+                        sb.append("  ").append(task).append("\n");
                         validDate = true;
                     }
                 } else if (task instanceof Event e) {
                     if (!e.from.toLocalDate().isAfter(target) && !e.to.toLocalDate().isBefore(target)) {
-                        System.out.println(Ui.SPACE + task);
+                        sb.append("  ").append(task).append("\n");
                         validDate = true;
                     }
                 }
             }
-
             if (!validDate) {
-                System.out.println(Ui.SPACE + "Phew! There are no tasks on this date!");
+                sb.append("Phew! There are no tasks on this date!\n");
             }
-            System.out.println(Ui.SPACE + Ui.LINE);
-
+            return sb.toString();
         } catch (DateTimeParseException e) {
             throw new HuanException("Invalid date format! (yyyy-MM-dd)");
         }
@@ -205,10 +213,12 @@ public class TaskList {
      * Checks if there are any tasks with a matching description.
      *
      * @param description The description of the task to find.
+     * @return A message listing the matching tasks.
      */
-    public void findTasks(String description) {
+    public String findTasks(String description) {
         boolean existsTask = false;
         TaskList newTasks = new TaskList();
+        StringBuilder sb = new StringBuilder();
         for (Task task : tasks) {
             if (task.description.toLowerCase().contains(description.toLowerCase())) {
                 newTasks.loadTask(task);
@@ -216,16 +226,13 @@ public class TaskList {
             }
         }
         if (!existsTask) {
-            Ui.printFormat("No such task found!");
+            sb.append("No such task found!");
         } else {
-            System.out.println(Ui.SPACE + Ui.LINE);
-            System.out.println(Ui.SPACE + "Here are the matching tasks in your list:");
+            sb.append("Here are the matching tasks in your list:\n");
             for (Task task : newTasks.getTaskList()) {
-                System.out.println(Ui.SPACE + task);
+                sb.append("  ").append(task).append("\n");
             }
-            System.out.println(Ui.SPACE + Ui.LINE);
         }
-
+        return sb.toString();
     }
-
 }
