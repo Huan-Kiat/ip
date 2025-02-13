@@ -26,7 +26,8 @@ public class Parser {
      * @return The corresponding Command.
      */
     public static Command parseInput(String input) {
-        if (input == null || input.isEmpty()) {
+        assert (input != null) : "Input should not be null";
+        if (input.isEmpty()) {
             return new InvalidCommand("Invalid input!");
         }
         String[] parts = input.split(" ", 2);
@@ -72,10 +73,8 @@ public class Parser {
             }
         }
         case "todo":
-            // remainder = "description"
             return new TodoCommand(remainder);
         case "deadline": {
-            // expect "deadline <desc> /by <yyyy-MM-dd HHmm>"
             String[] deadlineParts = remainder.split("/by", 2);
             if (deadlineParts.length < 2) {
                 return new InvalidCommand("Follow format: deadline <desc> /by " + DATETIME_FORMAT);
@@ -85,8 +84,6 @@ public class Parser {
             return new DeadlineCommand(desc, by);
         }
         case "event": {
-            // expect "event <desc> /from <start> /to <end>"
-            // e.g. event project meeting /from 2025-02-08 1000 /to 2025-02-08 1200
             String[] fromParts = remainder.split("/from", 2);
             if (fromParts.length < 2) {
                 return new InvalidCommand(
