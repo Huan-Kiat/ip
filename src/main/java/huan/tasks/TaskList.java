@@ -26,13 +26,15 @@ public class TaskList {
      * @return The confirmation message.
      */
     public String addTask(Task task) {
+        String conflictResponse = hasConflict(task);
         tasks.add(task);
         StringBuilder sb = new StringBuilder();
-        sb.append("____________________________________________________________\n");
         sb.append("Got it. I've added this task:\n");
         sb.append("  ").append(tasks.get(tasks.size() - 1)).append("\n");
         sb.append("You now have ").append(tasks.size()).append(" task(s) in your list\n");
-        sb.append("____________________________________________________________");
+        if (!conflictResponse.isEmpty()) {
+            sb.append("\nWarning: ").append(conflictResponse).append("\n");
+        }
         return sb.toString();
     }
 
@@ -50,11 +52,9 @@ public class TaskList {
         Task removedTask = tasks.get(id - 1);
         tasks.remove(id - 1);
         StringBuilder sb = new StringBuilder();
-        sb.append("____________________________________________________________\n");
         sb.append("Noted. I've removed this task:\n");
         sb.append("  ").append(removedTask).append("\n");
         sb.append("You now have ").append(tasks.size()).append(" task(s) in your list\n");
-        sb.append("____________________________________________________________");
         return sb.toString();
     }
 
@@ -118,10 +118,8 @@ public class TaskList {
         Task t = this.getTask(id - 1);
         t.markAsDone();
         StringBuilder sb = new StringBuilder();
-        sb.append("____________________________________________________________\n");
         sb.append("Nice! I've marked this task as done:\n");
         sb.append("  ").append(t).append("\n");
-        sb.append("____________________________________________________________");
         return sb.toString();
     }
 
@@ -142,36 +140,6 @@ public class TaskList {
         sb.append("OK, I've marked this task as not done yet:\n");
         sb.append("  ").append(t).append("\n");
         return sb.toString();
-    }
-
-    /**
-     * Adds a Deadline and returns the confirmation message.
-     *
-     * @param description Description of deadline.
-     * @param by Deadline date.
-     */
-    public String addDeadline(String description, String by) {
-        return this.addTask(new Deadline(description, by));
-    }
-
-    /**
-     * Adds an Event and returns the confirmation message.
-     *
-     * @param description Description of event.
-     * @param from Start date/time of event.
-     * @param to End date/time of event.
-     */
-    public String addEvent(String description, String from, String to) {
-        return this.addTask(new Event(description, from, to));
-    }
-
-    /**
-     * Adds a Todo and returns the confirmation message.
-     *
-     * @param description Description of todo.
-     */
-    public String addTodo(String description) {
-        return this.addTask(new Todo(description));
     }
 
     /**
@@ -234,5 +202,33 @@ public class TaskList {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Checks if a new task conflicts with any existing tasks.
+     *
+     * @param newTask The new task to be added.
+     * @return A warning message if there's a conflict, or an empty string if none.
+     */
+    public String hasConflict(Task newTask) {
+        if (newTask instanceof Todo todo) {
+            return "";
+        }
+
+        for (Task task : tasks) {
+            if (task instanceof Deadline && newTask instanceof Deadline) {
+                continue;
+            } else if (task instanceof Event existingEvent && newTask instanceof Event newEvent) {
+                if (!newEvent.from.isAfter(existingEvent.to) && !newEvent.to.isBefore(existingEvent.from)) {
+                    return "This event clashes with another event! :\n  " + existingEvent;
+                }
+            } else if (task instanceof Event existingEvent && newTask instanceof Deadline newDeadline) {
+                if (!newDeadline.by.isBefore(existingEvent.from) && !newDeadline.by.isAfter(existingEvent.to)) {
+                    return "This deadline falls within an event period! :\n  " + existingEvent;
+                }
+            }
+        }
+
+        return "";
     }
 }
