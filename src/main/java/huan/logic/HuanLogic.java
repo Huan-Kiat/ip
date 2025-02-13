@@ -21,11 +21,14 @@ public class HuanLogic {
      */
     public HuanLogic() {
         storage = new Storage(FILE_PATH);
+        assert (storage != null) : "Storage should not be null";
         try {
             tasks = storage.loadTasks();
+
         } catch (HuanException e) {
             tasks = new TaskList();
         }
+        assert (tasks != null) : "Tasks should not be null";
     }
     /**
      * Processes the user input and returns a response string by delegating to Command classes.
@@ -36,6 +39,7 @@ public class HuanLogic {
     public String getResponse(String input) {
         try {
             Command command = Parser.parseInput(input);
+            assert (command != null) : "Command should not be null";
             String response = command.execute(tasks, storage);
             if (command.isExit()) {
                 Platform.exit();
