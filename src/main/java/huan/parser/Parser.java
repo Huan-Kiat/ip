@@ -12,14 +12,13 @@ import huan.command.MarkCommand;
 import huan.command.OnCommand;
 import huan.command.TodoCommand;
 import huan.command.UnmarkCommand;
-import huan.exception.HuanException;
-import huan.tasks.TaskList;
 
 /**
  * Handles parsing of user commands and input.
  */
 public class Parser {
-
+    private static final String INTEGER_ERROR = "Task number must be an integer!";
+    private static final String DATETIME_FORMAT = "<yyyy-MM-dd HHmm>";
     /**
      * Parse the user input to determine the input type.
      *
@@ -47,7 +46,7 @@ public class Parser {
                 int taskNum = Integer.parseInt(remainder);
                 return new MarkCommand(taskNum);
             } catch (NumberFormatException e) {
-                return new InvalidCommand("Task number must be an integer!");
+                return new InvalidCommand(INTEGER_ERROR);
             }
         }
         case "unmark": {
@@ -58,7 +57,7 @@ public class Parser {
                 int taskNum = Integer.parseInt(remainder);
                 return new UnmarkCommand(taskNum);
             } catch (NumberFormatException e) {
-                return new InvalidCommand("Task number must be an integer!");
+                return new InvalidCommand(INTEGER_ERROR);
             }
         }
         case "delete": {
@@ -69,7 +68,7 @@ public class Parser {
                 int taskNum = Integer.parseInt(remainder);
                 return new DeleteCommand(taskNum);
             } catch (NumberFormatException e) {
-                return new InvalidCommand("Task number must be an integer!");
+                return new InvalidCommand(INTEGER_ERROR);
             }
         }
         case "todo":
@@ -79,7 +78,7 @@ public class Parser {
             // expect "deadline <desc> /by <yyyy-MM-dd HHmm>"
             String[] deadlineParts = remainder.split("/by", 2);
             if (deadlineParts.length < 2) {
-                return new InvalidCommand("Follow format: deadline <desc> /by <yyyy-MM-dd HHmm>");
+                return new InvalidCommand("Follow format: deadline <desc> /by " + DATETIME_FORMAT);
             }
             String desc = deadlineParts[0].trim();
             String by = deadlineParts[1].trim();
@@ -91,7 +90,7 @@ public class Parser {
             String[] fromParts = remainder.split("/from", 2);
             if (fromParts.length < 2) {
                 return new InvalidCommand(
-                        "Follow format: event <desc> /from <yyyy-MM-dd HHmm> /to <yyyy-MM-dd HHmm>"
+                        "Follow format: event <desc> /from " + DATETIME_FORMAT + " /to " + DATETIME_FORMAT
                 );
             }
             String desc = fromParts[0].trim();
@@ -99,7 +98,7 @@ public class Parser {
             String[] toParts = fromParts[1].split("/to", 2);
             if (toParts.length < 2) {
                 return new InvalidCommand(
-                        "Follow format: event <desc> /from <yyyy-MM-dd HHmm> /to <yyyy-MM-dd HHmm>"
+                        "Follow format: event <desc> /from " + DATETIME_FORMAT + " /to " + DATETIME_FORMAT
                 );
             }
             String from = toParts[0].trim();
@@ -108,7 +107,7 @@ public class Parser {
         }
         case "on":
             if (remainder.isEmpty()) {
-                return new InvalidCommand("Follow format: on yyyy-MM-dd");
+                return new InvalidCommand("Follow format: on " + DATETIME_FORMAT);
             }
             return new OnCommand(remainder);
         case "find":
@@ -120,65 +119,5 @@ public class Parser {
         default:
             return new InvalidCommand("Invalid input!");
         }
-    }
-
-    /**
-     * Parses user input for a deadline and returns the confirmation message.
-     *
-     * @param tasks Task list.
-     * @param input User input.
-     * @return The confirmation message.
-     * @throws HuanException for invalid formats.
-     */
-    public static String parseDeadline(TaskList tasks, String input) throws HuanException {
-        String[] deadlineParts = input.split("/by", 2);
-        if (deadlineParts.length < 2 || deadlineParts[0].substring(9).trim().isEmpty()
-                || deadlineParts[1].trim().isEmpty()) {
-            throw new HuanException("Follow format \"deadline (description) /by (yyyy-MM-dd HHmm)\"");
-        }
-        String deadlineDescription = deadlineParts[0].substring(9).trim();
-        String by = deadlineParts[1].trim();
-        return tasks.addDeadline(deadlineDescription, by);
-    }
-
-    /**
-     * Parses user input for a todo and returns the confirmation message.
-     *
-     * @param tasks Task list.
-     * @param input User input.
-     * @return The confirmation message.
-     * @throws HuanException for invalid formats.
-     */
-    public static String parseToDo(TaskList tasks, String input) throws HuanException {
-        if (input.trim().length() <= 4) {
-            throw new HuanException("Todo description cannot be empty!");
-        }
-        String todoDescription = input.substring(5).trim();
-        return tasks.addTodo(todoDescription);
-    }
-
-    /**
-     * Parses user input for an event and returns the confirmation message.
-     *
-     * @param tasks Task list.
-     * @param input User input.
-     * @return The confirmation message.
-     * @throws HuanException for invalid formats.
-     */
-    public static String parseEvent(TaskList tasks, String input) throws HuanException {
-        String[] fromParts = input.split("/from", 2);
-        if (fromParts.length < 2 || fromParts[0].substring(6).trim().isEmpty()) {
-            throw new HuanException("Follow format "
-                    + "\"event (description) /from (yyyy-MM-dd HHmm) /to (yyyy-MM-dd HHmm)\"");
-        }
-        String eventDescription = fromParts[0].substring(6).trim();
-        String[] toParts = fromParts[1].split("/to", 2);
-        if (toParts.length < 2 || toParts[0].trim().isEmpty() || toParts[1].trim().isEmpty()) {
-            throw new HuanException("Follow format "
-                    + "\"event (description) /from (yyyy-MM-dd HHmm) /to (yyyy-MM-dd HHmm)\"");
-        }
-        String from = toParts[0].trim();
-        String to = toParts[1].trim();
-        return tasks.addEvent(eventDescription, from, to);
     }
 }
