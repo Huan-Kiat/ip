@@ -19,7 +19,7 @@ public abstract class Command {
     public abstract String execute(TaskList tasks, Storage storage) throws HuanException;
 
     /**
-     * Whether this command should exit.
+     * Determines whether this command should exit.
      *
      * @return True if the chatbot should end, false otherwise.
      */

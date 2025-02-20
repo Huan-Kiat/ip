@@ -154,21 +154,21 @@ public class TaskList {
             LocalDate target = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             StringBuilder sb = new StringBuilder();
             sb.append("Here are the task(s) on this date:\n");
-            boolean validDate = false;
+            boolean isValidDate = false;
             for (Task task : this.getTaskList()) {
                 if (task instanceof Deadline d) {
                     if (d.by.toLocalDate().equals(target)) {
                         sb.append("  ").append(task).append("\n");
-                        validDate = true;
+                        isValidDate = true;
                     }
                 } else if (task instanceof Event e) {
                     if (!e.from.toLocalDate().isAfter(target) && !e.to.toLocalDate().isBefore(target)) {
                         sb.append("  ").append(task).append("\n");
-                        validDate = true;
+                        isValidDate = true;
                     }
                 }
             }
-            if (!validDate) {
+            if (!isValidDate) {
                 sb.append("Phew! There are no tasks on this date!\n");
             }
             return sb.toString();
@@ -184,16 +184,16 @@ public class TaskList {
      * @return A message listing the matching tasks.
      */
     public String findTasks(String description) {
-        boolean existsTask = false;
+        boolean doesTaskExist = false;
         TaskList newTasks = new TaskList();
         StringBuilder sb = new StringBuilder();
         for (Task task : tasks) {
             if (task.description.toLowerCase().contains(description.toLowerCase())) {
                 newTasks.loadTask(task);
-                existsTask = true;
+                doesTaskExist = true;
             }
         }
-        if (!existsTask) {
+        if (!doesTaskExist) {
             sb.append("No such task found!");
         } else {
             sb.append("Here are the matching tasks in your list:\n");

@@ -20,7 +20,7 @@ public class Parser {
     private static final String INTEGER_ERROR = "Task number must be an integer!";
     private static final String DATETIME_FORMAT = "<yyyy-MM-dd HHmm>";
     /**
-     * Parse the user input to determine the input type.
+     * Parses the user input to determine the input type.
      *
      * @param input Input string.
      * @return The corresponding Command.
